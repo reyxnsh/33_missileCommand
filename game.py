@@ -67,6 +67,22 @@ class Explosion:
     @property
     def done(self):
         return self.age >= EXPLOSION_TIME
+    def explosion_color(progress):
+    
+    #Return an (r, g, b) colour for an explosion (progress 0..1 of its life).
+        progress = max(0.0, min(1.0, progress))
+        white = (255, 255, 255)
+
+        if progress < 0.5:
+        # Igniting: orange -> white-hot at mid-life
+            t = progress / 0.5
+            start, end = (255, 140, 30), white
+        else:
+        # Fading: white-hot -> deep red
+            t = (progress - 0.5) / 0.5
+            start, end = white, (190, 20, 20)
+
+        return tuple(int(s + (e - s) * t) for s, e in zip(start, end))
 
 
 class Missile:
@@ -102,14 +118,17 @@ class Game:
             battery.alive, battery.ammo = True, AMMO_PER_BATTERY
 
     def nearest_battery(self, target):
-        return min(self.batteries, key=lambda b: b.pos.distance_squared_to(target))
+        candidates = [b for b in self.batteries if b.alive and b.ammo > 0]
+        if not candidates:
+            return None
+        return min(candidates, key=lambda b: b.pos.distance_squared_to(target))
 
     def launch(self, target):
         target = pygame.Vector2(target)
         if self.state != "play" or target.y > GROUND_Y - 20:
             return
         battery = self.nearest_battery(target)
-        if battery.alive and battery.ammo > 0:
+        if battery is not None:
             battery.ammo -= 1
             self.interceptors.append(Interceptor(battery.pos, target))
 
