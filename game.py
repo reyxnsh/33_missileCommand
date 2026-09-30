@@ -25,7 +25,7 @@ def on_city_destroyed(city, cities_remaining):
 
 def city_repair_threshold():
     """Return a score value at which a destroyed city is rebuilt, or None to disable city repair."""
-    pass
+    return 2000
 
 
 class Battery:
@@ -184,7 +184,7 @@ class Game:
                 on_city_destroyed(target, sum(c.alive for c in self.cities))
         self.explosions.append(Explosion(missile.pos, 30))
         if not any(c.alive for c in self.cities):
-            git self.state = "lose"
+            self.state = "lose"
 
     def finish_wave(self):
         self.score += 100 * sum(c.alive for c in self.cities) + 5 * sum(b.ammo for b in self.batteries)
