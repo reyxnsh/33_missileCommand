@@ -12,9 +12,15 @@ def explosion_color(progress):
     pass
 
 
-def on_city_destroyed(city):
-    """Called when a city is hit; add screen shake, sounds, or a game-over warning here."""
-    pass
+def on_city_destroyed(city, cities_remaining):
+    """Called when a city is hit; warn on the console with how many cities are left."""
+    total = 6
+    if cities_remaining == 0:
+        print("WARNING: Final city destroyed! All cities lost.")
+    elif cities_remaining == 1:
+        print(f"WARNING: City at x={city.pos.x:.0f} destroyed! Only 1 city remains!")
+    else:
+        print(f"WARNING: City at x={city.pos.x:.0f} destroyed! {cities_remaining}/{total} cities remaining.")
 
 
 def city_repair_threshold():
@@ -175,10 +181,10 @@ class Game:
         if target.alive:
             target.alive = False
             if isinstance(target, City):
-                on_city_destroyed(target)
+                on_city_destroyed(target, sum(c.alive for c in self.cities))
         self.explosions.append(Explosion(missile.pos, 30))
         if not any(c.alive for c in self.cities):
-            self.state = "lose"
+            git self.state = "lose"
 
     def finish_wave(self):
         self.score += 100 * sum(c.alive for c in self.cities) + 5 * sum(b.ammo for b in self.batteries)
